@@ -16,6 +16,10 @@ class MainActivity : AppCompatActivity(),  View.OnClickListener  {
 
         binding.buttonCalculate.setOnClickListener(this)
 
+        binding.radioAoAno.setOnClickListener(this)
+        binding.radioAoMes.setOnClickListener(this)
+        binding.radioAoDia.setOnClickListener(this)
+
     }
 
     private fun convertAnualToMensal( aoAno: Double): Double {
@@ -37,26 +41,87 @@ class MainActivity : AppCompatActivity(),  View.OnClickListener  {
         return diaria
 
     }
+    private fun convertMensalToAnual(aoMes: Double):Double{
+
+      var anual= Math.pow( (1+aoMes),12.00) - 1
+      return anual
+
+    }
+    private fun convertDiariaToMensal(aoDia:Double):Double{
+        var mensal= Math.pow((1+aoDia),30.00) - 1
+        return mensal
+    }
+    private fun converte(){
+        var taxaAoAno:Double
+        var taxaAoMes:Double
+        var taxaAoDia:Double
+
+        if(binding.radioAoAno.isChecked){
+
+             taxaAoAno= binding.editTextTaxaDeJurosAoAno.text.toString().toDouble()
+             taxaAoMes=convertAnualToMensal(taxaAoAno)
+             taxaAoDia= convertMensalToDiaria(convertAnualToMensal(taxaAoAno))
+
+            print(taxaAoAno.toString(),taxaAoMes.toString(),taxaAoDia.toString())
+        }
+        if(binding.radioAoMes.isChecked){
+
+             taxaAoMes = binding.editTextTaxaDeJurosAoMes.text.toString().toDouble()
+             taxaAoAno = convertMensalToAnual(taxaAoMes)
+             taxaAoDia= convertMensalToDiaria(taxaAoMes)
+
+            print(taxaAoAno.toString(),taxaAoMes.toString(),taxaAoDia.toString())
+
+
+        }
+        if (binding.radioAoDia.isChecked){
+
+            taxaAoDia= binding.editTextTaxaDeJurosAoDia.text.toString().toDouble()
+            taxaAoMes = convertDiariaToMensal(taxaAoDia)
+            taxaAoAno = convertMensalToAnual(taxaAoMes)
+
+            print(taxaAoAno.toString(),taxaAoMes.toString(),taxaAoDia.toString())
+
+        }
+
+
+
+
+    }
+     private fun print(aoAno:String,aoMes:String,aoDia:String){
+         binding.textViewResultadoEquivalenteAoAno.text=aoAno
+         binding.textViewResultadoEquivalenteAoDia.text=aoDia
+         binding.textViewResultadoEquivalenteAoMes.text= aoMes
+     }
 
     override fun onClick(v: View) {
+
+        if(v.id==R.id.radio_aoAno){
+            binding.editTextTaxaDeJurosAoDia.isEnabled=false
+            binding.editTextTaxaDeJurosAoMes.isEnabled=false
+            binding.editTextTaxaDeJurosAoAno.isEnabled=true
+        }
+        if (v.id==R.id.radio_aoMes){
+            binding.editTextTaxaDeJurosAoDia.isEnabled=false
+            binding.editTextTaxaDeJurosAoAno.isEnabled=false
+            binding.editTextTaxaDeJurosAoMes.isEnabled=true
+        }
+        if(v.id==R.id.radio_aoDia){
+            binding.editTextTaxaDeJurosAoAno.isEnabled=false
+            binding.editTextTaxaDeJurosAoMes.isEnabled=false
+            binding.editTextTaxaDeJurosAoDia.isEnabled=true
+        }
+
         if(v.id==R.id.button_calculate) {
             if (isValid()) {
-
-                var taxaAoAno= binding.editTextTaxaDeJurosAoAno.text.toString().toDouble()
-                var taxaAoMes=convertAnualToMensal(taxaAoAno)
-                var taxaAoDia= convertMensalToDiaria(convertAnualToMensal(taxaAoAno))
-
-                //var taxaAoDia= convertMensalToDiaria(0.06)
-
-                binding.textViewResultadoEquivalenteAoAno.text=binding.editTextTaxaDeJurosAoAno.text.toString()
-                binding.textViewResultadoEquivalenteAoMes.text=taxaAoMes.toString()
-                binding.textViewResultadoEquivalenteAoDia.text=taxaAoDia.toString()
+                converte()
 
             } else {
                 //R.string.fill_all_fields
                 Toast.makeText(this, "algo deu errado", Toast.LENGTH_SHORT).show()
             }
         }
+
     }
 
     private fun isValid(): Boolean {
